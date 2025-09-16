@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Корзина - Культура.РФ</title>
+    <link rel="stylesheet" href="/static/styles/cart_style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <a href="/" class="logo-link">
+                <img src="/static/img/cultlogo.png" alt="Культура.РФ">
+            </a>
+        </div>
+    </header>
+    
+    <main class="cart-container">
+        <h1>ЛÉТОПИСИ ИССЛЕДОВАНИЕ</h1>
+        
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" value="{{ .cart.SearchEvent }}" class="search-input search-input-filled">
+            </div>
+            <div class="name-event"></div>
+                <input type="text" value="{{ .cart.Event }}" class="name-event-input name-event-filled">
+            </div>
+        </div>
+        
+        <div class="table-header">
+            <div class="col-title">Название документа</div>
+            <div class="col-author">Автор(ы)</div>
+            <div class="col-date">Дата создания</div>
+            <div class="col-time">Время действия</div>
+            <div class="col-place">Место</div>
+            <div class="col-availability">Наличие</div>
+            <div class="col-status"></div>
+        </div>
+        
+        <div class="chronicles-list">
+            {{ range .cart.Components }}
+            <div class="chronicle-row">
+                <div class="chronicle-info">
+                    <img src="{{ .Image }}" alt="{{ .Title }}" class="chronicle-image">
+                    <div class="chronicle-details">
+                        <h3>{{ .Title }}</h3>
+                    </div>
+                </div>
+                <div class="col-author">{{ .Author }}</div>
+                <div class="col-date">{{ .DateOfCreation }}</div>
+                <div class="col-time">{{ .TimeOfAction }}</div>
+                <div class="col-place">{{ .Location }}</div>
+                <div class="col-availability">
+                    <input type="text" value="{{ .Quote }}" class="availability-input">
+                    
+                </div>
+                <div class="col-status">
+                    <div class="status-indicator {{ if .IsMatched }}matched{{ else }}not-matched{{ end }}">
+                        <span class="status-icon">{{ if .IsMatched }}✓{{ else }}✗{{ end }}</span>
+                    </div>
+                </div>
+            </div>
+            {{ end }}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-text-container">
+                <span class="first-letter">К</span>
+                <div class="footer-text">
+                    "Культура.РФ" - гуманитарный просветительский проект, посвященный описанию исторических событий с комментариями на выбранные источники. Предоставление летописей и других первичных источников с отрывками текста.
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
