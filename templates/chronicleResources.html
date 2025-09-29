@@ -36,6 +36,9 @@
             <div class="resource-actions">
                     <a href="/chronicle/{{ .ID }}" class="btn-details">Подробнее</a>
             </div>
+                <form action="/chronicle/{{ .ID }}/add-to-research" method="POST">
+                    <button type="submit" class="btn-add-research">Добавить в исследование</button>
+                </form>
         </div>
         {{ end }}
     </div>
@@ -51,7 +54,7 @@
         </div>
     </footer>
     
-    <a href="/chronicle-research/1" class="research-button">
+    <a href="/chronicle-research/{{ .draftRequestID }}" class="research-button">
         <svg class="research-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <path d="M28,14h-5V6c0-0.6-0.4-1-1-1H4C3.4,5,3,5.4,3,6v18c0,2.2,1.8,4,4,4h17c0.1,0,0.2,0,0.3-0.1c0.2,0,0.4,0.1,0.7,0.1
             c2.2,0,4-1.8,4-4v-9C29,14.4,28.6,14,28,14z M10,16H8c-0.6,0-1-0.4-1-1s0.4-1,1-1h2c0.6,0,1,0.4,1,1S10.6,16,10,16z M14,12H8

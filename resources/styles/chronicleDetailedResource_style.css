@@ -60,6 +60,7 @@ header img {
     border-radius: 40px;
     padding: 40px;
     margin-bottom: 40px;
+    position: relative;
 }
 
 .chronicle-image {
@@ -91,6 +92,28 @@ header img {
 
 .spec-item strong {
     color: #850000;
+}
+
+.btn-add-research{
+    display: flex;
+    background-color: #ACA4A4;
+    color: #594949;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 18px;
+    width: 200px;
+    height: 38px;
+    position: absolute; 
+    bottom: 20px; 
+    right: 160px; 
+    text-align: center;
+    justify-content: center;
+    text-decoration: none;
+    align-items: center;
+
+    border: none;
+    outline: none;
+    cursor: pointer;
 }
 
 .site-footer {

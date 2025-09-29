@@ -160,6 +160,28 @@ h1 {
     align-items: center;
 }
 
+.btn-add-research{
+    display: flex;
+    background-color: #ACA4A4;
+    color: #594949;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 18px;
+    width: 132px;
+    height: 38px;
+    position: absolute; 
+    bottom: 20px; 
+    right: 160px; 
+    text-align: center;
+    justify-content: center;
+    text-decoration: none;
+    align-items: center;
+
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
 
 .site-footer {
     background-color: #594949;
