@@ -16,9 +16,9 @@ const (
 )
 
 type RequestChronicleResearch struct {
-	ID          uint   `gorm:"primaryKey;autoIncrement"`
-	Name        string `gorm:"type:varchar(100);not null"`
-	SearchEvent string `gorm:"type:varchar(100)"`
+	ID          uint   `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name        string `gorm:"type:varchar(100);not null" json:"name"`
+	SearchEvent string `gorm:"type:varchar(100)" json:"search_event"`
 
 	Status      RequestStatus `gorm:"type:varchar(20);not null;check:status IN ('черновик','удалён','сформирован','завершён','отклонён')"`
 	CreatedAt   time.Time     `gorm:"not null"`

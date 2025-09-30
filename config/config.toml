@@ -1,2 +1,9 @@
 ServiceHost = "0.0.0.0"
 ServicePort = 8080
+
+[MinIO]
+Endpoint = "127.0.0.1:9000"
+AccessKeyID = "minio"
+SecretAccessKey = "minio124"
+UseSSL = false
+BucketName = "books"
