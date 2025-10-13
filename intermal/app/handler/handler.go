@@ -20,29 +20,29 @@ func NewHandler(r *repository.Repository) *Handler {
 func (h *Handler) RegisterAPI(router *gin.Engine) {
 	api := router.Group("/api")
 	{
-		chronicles := api.Group("/chronicle-resources")
+		chronicles := api.Group("/chronicle_resources")
 		{
 			chronicles.GET("", h.GetChronicleResourcesAPI)
-			chronicles.GET("/:id", h.GetChronicleResourceAPI)
+			chronicles.GET("/:id_chronicle_resource", h.GetChronicleResourceAPI)
 			chronicles.POST("", h.CreateChronicleResourceAPI)
-			chronicles.PUT("/:id", h.UpdateChronicleResourceAPI)
-			chronicles.DELETE("/:id", h.DeleteChronicleResourceAPI)
-			chronicles.POST("/:id/image", h.UploadChronicleResourceImageAPI)
-			chronicles.POST("/:id/add-to-request", h.AddChronicleToRequestAPI)
+			chronicles.PUT("/:id_chronicle_resource", h.UpdateChronicleResourceAPI)
+			chronicles.DELETE("/:id_chronicle_resource", h.DeleteChronicleResourceAPI)
+			chronicles.POST("/:id_chronicle_resource/image", h.UploadChronicleResourceImageAPI)
+			chronicles.POST("/:id_chronicle_resource/add_to_chronicle_request", h.AddChronicleToRequestAPI)
 		}
 
-		requests := api.Group("/requests")
+		requests := api.Group("/ChronicleRequestList")
 		{
-			requests.GET("/draft-info", h.GetDraftRequestInfoAPI)
+			requests.GET("/chronicle_draft", h.GetDraftRequestInfoAPI)
 			requests.GET("", h.GetRequestChronicleResearchAPI)
-			requests.GET("/:id", h.GetRequestWithChroniclesAPI)
-			requests.PUT("/:id", h.UpdateRequestChronicleResearchAPI)
-			requests.PUT("/:id/form", h.FormRequestChronicleResearchAPI)
-			requests.PUT("/:id/complete-or-reject", h.CompleteOrRejectRequestChronicleResearchAPI)
-			requests.DELETE("/:id", h.DeleteRequestChronicleResearchAPI)
+			requests.GET("/:id_chronicle_request", h.GetRequestWithChroniclesAPI)
+			requests.PUT("/:id_chronicle_request", h.UpdateRequestChronicleResearchAPI)
+			requests.PUT("/:id_chronicle_request/chronicle_request-form", h.FormRequestChronicleResearchAPI)
+			requests.PUT("/:id_chronicle_request/chronicle_complete-or-reject", h.CompleteOrRejectRequestChronicleResearchAPI)
+			requests.DELETE("/:id_chronicle_request", h.DeleteRequestChronicleResearchAPI)
 		}
 
-		chronicleResearch := api.Group("/chronicle-research")
+		chronicleResearch := api.Group("/chronicle_research")
 		{
 			chronicleResearch.PUT("/:id/chronicles/:chronicle_id", h.UpdateChronicleResearchInRequestAPI)
 			chronicleResearch.DELETE("/:id/chronicles/:chronicle_id", h.DeleteChronicleResearchFromRequestAPI)

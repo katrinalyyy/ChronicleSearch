@@ -30,7 +30,7 @@ func (h *Handler) GetChronicleResourcesAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) GetChronicleResourceAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_resource")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -75,7 +75,7 @@ func (h *Handler) CreateChronicleResourceAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateChronicleResourceAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_resource")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -105,7 +105,7 @@ func (h *Handler) UpdateChronicleResourceAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) DeleteChronicleResourceAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_resource")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -129,7 +129,7 @@ func (h *Handler) DeleteChronicleResourceAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) UploadChronicleResourceImageAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_resource")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -188,7 +188,7 @@ func (h *Handler) UploadChronicleResourceImageAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) AddChronicleToRequestAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_resource")
 	chronicleID, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))

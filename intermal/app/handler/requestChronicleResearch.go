@@ -29,6 +29,7 @@ func (h *Handler) GetDraftRequestInfoAPI(ctx *gin.Context) {
 
 func (h *Handler) GetRequestChronicleResearchAPI(ctx *gin.Context) {
 	var startDate, endDate *time.Time
+	status := ctx.Query("status")
 
 	if startDateStr := ctx.Query("start_date"); startDateStr != "" {
 		if parsed, err := time.Parse("2006-01-02", startDateStr); err == nil {
@@ -42,7 +43,7 @@ func (h *Handler) GetRequestChronicleResearchAPI(ctx *gin.Context) {
 		}
 	}
 
-	requests, err := h.Repository.GetRequestChronicleResearch("", startDate, endDate)
+	requests, err := h.Repository.GetRequestChronicleResearch(status, startDate, endDate)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusInternalServerError, err)
 		return
@@ -55,7 +56,7 @@ func (h *Handler) GetRequestChronicleResearchAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) GetRequestWithChroniclesAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_request")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -72,6 +73,13 @@ func (h *Handler) GetRequestWithChroniclesAPI(ctx *gin.Context) {
 		return
 	}
 
+	// Очищаем детальные поля из chronicle_resource для краткого представления
+	for i := range chronicles {
+		chronicles[i].ChronicleResource.DetailedDescription = ""
+		chronicles[i].ChronicleResource.DetailedSignificance = ""
+		chronicles[i].ChronicleResource.DetailedEditions = ""
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"status":     "success",
 		"request":    request,
@@ -80,7 +88,7 @@ func (h *Handler) GetRequestWithChroniclesAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateRequestChronicleResearchAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_request")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -110,7 +118,7 @@ func (h *Handler) UpdateRequestChronicleResearchAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) FormRequestChronicleResearchAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_request")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -136,7 +144,7 @@ func (h *Handler) FormRequestChronicleResearchAPI(ctx *gin.Context) {
 }
 
 func (h *Handler) CompleteOrRejectRequestChronicleResearchAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_request")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))
@@ -187,7 +195,7 @@ func (h *Handler) CompleteOrRejectRequestChronicleResearchAPI(ctx *gin.Context) 
 }
 
 func (h *Handler) DeleteRequestChronicleResearchAPI(ctx *gin.Context) {
-	idStr := ctx.Param("id")
+	idStr := ctx.Param("id_chronicle_request")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid ID format"))

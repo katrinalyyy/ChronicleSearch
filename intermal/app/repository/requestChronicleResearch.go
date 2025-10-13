@@ -272,7 +272,7 @@ func (r *Repository) GetDraftRequestInfo() (uint, int, error) {
 // CreateRequestChronicleResearchWithChronicle создает заявку-черновик с хроникой
 func (r *Repository) CreateRequestChronicleResearchWithChronicle(chronicleID uint) (ds.RequestChronicleResearch, error) {
 	request := ds.RequestChronicleResearch{
-		Name:        "Исследование хроники",
+		Name:        "",
 		SearchEvent: "",
 		Status:      ds.RequestStatusDraft,
 		CreatedAt:   time.Now(),

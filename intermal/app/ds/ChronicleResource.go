@@ -8,7 +8,7 @@ type ChronicleResource struct {
 	DateOfCreation       string `gorm:"type:varchar(50);not null" json:"date_of_creation"`
 	TimeOfAction         string `gorm:"type:varchar(50);not null" json:"time_of_action"`
 	Location             string `gorm:"type:varchar(50);not null" json:"location"`
-	DetailedDescription  string `gorm:"type:text" json:"detailed_description"`
-	DetailedSignificance string `gorm:"type:text" json:"detailed_significance"`
-	DetailedEditions     string `gorm:"type:text" json:"detailed_editions"`
+	DetailedDescription  string `gorm:"type:text" json:"detailed_description,omitempty"`
+	DetailedSignificance string `gorm:"type:text" json:"detailed_significance,omitempty"`
+	DetailedEditions     string `gorm:"type:text" json:"detailed_editions,omitempty"`
 }
