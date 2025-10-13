@@ -195,3 +195,18 @@ header img {
     font-weight: bold;
     border: 2px solid #850000;
 }
+
+.research-button.inactive {
+    background-color: #ACA4A4;
+    cursor: default;
+}
+
+.research-button.inactive .research-icon {
+    fill: #594949;
+}
+
+.research-button.inactive .research-count {
+    background-color: #594949;
+    color: #ACA4A4;
+    border-color: #ACA4A4;
+}

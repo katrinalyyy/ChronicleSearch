@@ -25,8 +25,8 @@ func (r *Repository) GetDraftRequestChronicleResearchInfo() (ds.RequestChronicle
 
 func (r *Repository) CreateRequestChronicleResearch(resourceID uint) (ds.RequestChronicleResearch, error) {
 	requestChronicleResearch := ds.RequestChronicleResearch{
-		Name:        "Крещение Руси",
-		SearchEvent: "крести всю землю",
+		Name:        "",
+		SearchEvent: "",
 		Status:      ds.RequestStatusDraft,
 		CreatorID:   1,
 	}
@@ -46,6 +46,11 @@ func (r *Repository) CreateRequestChronicleResearch(resourceID uint) (ds.Request
 func (r *Repository) checkIsMatch(quote string, searchEvent string) bool {
 	eventLower := strings.ToLower(strings.TrimSpace(searchEvent))
 	quoteLower := strings.ToLower(strings.TrimSpace(quote))
+
+	if quoteLower == "" || eventLower == "" {
+		return false
+	}
+
 	return strings.Contains(quoteLower, eventLower)
 }
 
@@ -56,7 +61,7 @@ func (r *Repository) AddChronicleResearchToRequest(requestID uint, resourceID ui
 		return err
 	}
 
-	quote := "Владимир крести всю землю Русскую"
+	quote := ""
 	isMatched := r.checkIsMatch(quote, request.SearchEvent)
 
 	chronicleResearch := ds.ChronicleResearch{
