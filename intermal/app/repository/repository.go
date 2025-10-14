@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"gorm.io/driver/postgres"
@@ -42,6 +43,8 @@ func New(dsn string, minioEndpoint, minioAccessKey, minioSecretKey, bucket strin
 		}
 	}
 
+	// Redis будет добавлен позже по методичке
+
 	return &Repository{
 		db:     db,
 		minio:  minioClient,
@@ -49,14 +52,18 @@ func New(dsn string, minioEndpoint, minioAccessKey, minioSecretKey, bucket strin
 	}, nil
 }
 
-// возвращает зафиксированный ID создателя
-func GetFixedCreatorID() uint {
-	return 1
+// возвращает зафиксированный UUID создателя (для обратной совместимости со старым кодом)
+// В реальном приложении UUID должен браться из JWT токена
+func GetFixedCreatorID() uuid.UUID {
+	// Возвращаем nil UUID - в реальном коде это должно браться из контекста
+	return uuid.Nil
 }
 
-// возвращает зафиксированный ID модератора
-func GetFixedModeratorID() uint {
-	return 2
+// возвращает зафиксированный UUID модератора (для обратной совместимости со старым кодом)
+// В реальном приложении UUID должен браться из JWT токена
+func GetFixedModeratorID() uuid.UUID {
+	// Возвращаем nil UUID - в реальном коде это должно браться из контекста
+	return uuid.Nil
 }
 
 func (r *Repository) ResetSequences() error {

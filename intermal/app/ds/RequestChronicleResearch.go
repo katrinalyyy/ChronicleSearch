@@ -3,6 +3,8 @@ package ds
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type RequestStatus string
@@ -24,9 +26,9 @@ type RequestChronicleResearch struct {
 	CreatedAt   time.Time     `gorm:"not null" json:"created_at"`
 	FormedAt    sql.NullTime  `gorm:"default:null" json:"formed_at"`
 	CompletedAt sql.NullTime  `gorm:"default:null" json:"completed_at"`
-	CreatorID   uint          `gorm:"not null" json:"-"`
-	ModeratorID sql.NullInt64 `json:"-"`
+	CreatorID   uuid.UUID     `gorm:"type:uuid;not null" json:"-"`
+	ModeratorID *uuid.UUID    `gorm:"type:uuid;default:null" json:"-"`
 
-	Creator   User `gorm:"foreignKey:CreatorID" json:"creator"`
-	Moderator User `gorm:"foreignKey:ModeratorID" json:"moderator"`
+	Creator   User `gorm:"foreignKey:CreatorID;references:UUID" json:"creator"`
+	Moderator User `gorm:"foreignKey:ModeratorID;references:UUID" json:"moderator"`
 }

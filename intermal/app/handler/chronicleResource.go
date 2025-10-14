@@ -12,6 +12,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetChronicleResourcesAPI godoc
+// @Summary Получить список хроник
+// @Description Получить список всех хроник с возможностью фильтрации по названию, автору и локации
+// @Tags chronicle_resources
+// @Accept json
+// @Produce json
+// @Param title query string false "Фильтр по названию"
+// @Param author query string false "Фильтр по автору"
+// @Param location query string false "Фильтр по локации"
+// @Success 200 {object} map[string]interface{} "success"
+// @Failure 500 {object} map[string]interface{} "error"
+// @Router /api/chronicle_resources [get]
 func (h *Handler) GetChronicleResourcesAPI(ctx *gin.Context) {
 	title := ctx.Query("title")
 	author := ctx.Query("author")
@@ -53,6 +65,18 @@ func (h *Handler) GetChronicleResourceAPI(ctx *gin.Context) {
 	})
 }
 
+// CreateChronicleResourceAPI godoc
+// @Summary Создать хронику
+// @Description Создание новой хроники (требуется авторизация)
+// @Tags chronicle_resources
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param chronicle body ds.ChronicleResource true "Данные хроники"
+// @Success 201 {object} map[string]interface{} "success"
+// @Failure 400 {object} map[string]interface{} "error"
+// @Failure 401 {object} map[string]interface{} "error"
+// @Router /api/chronicle_resources [post]
 func (h *Handler) CreateChronicleResourceAPI(ctx *gin.Context) {
 	var resource ds.ChronicleResource
 	if err := ctx.ShouldBindJSON(&resource); err != nil {

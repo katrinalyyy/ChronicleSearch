@@ -2,6 +2,8 @@ package config
 
 import (
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
@@ -12,6 +14,8 @@ type Config struct {
 	ServiceHost string
 	ServicePort int
 	MinIO       MinIOConfig
+	Redis       RedisConfig
+	JWT         JWTConfig
 }
 
 type MinIOConfig struct {
@@ -20,6 +24,21 @@ type MinIOConfig struct {
 	SecretAccessKey string
 	UseSSL          bool
 	BucketName      string
+}
+
+type RedisConfig struct {
+	Host        string
+	Password    string
+	Port        int
+	User        string
+	DialTimeout time.Duration
+	ReadTimeout time.Duration
+}
+
+type JWTConfig struct {
+	Token     string
+	ExpiresIn int
+	SigningMethod string
 }
 
 func NewConfig() (*Config, error) {
@@ -48,6 +67,22 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Читаем Redis конфигурацию из переменных окружения
+	const (
+		envRedisHost = "REDIS_HOST"
+		envRedisPort = "REDIS_PORT"
+		envRedisUser = "REDIS_USER"
+		envRedisPass = "REDIS_PASSWORD"
+	)
+
+	cfg.Redis.Host = os.Getenv(envRedisHost)
+	cfg.Redis.Port, err = strconv.Atoi(os.Getenv(envRedisPort))
+	if err != nil {
+		return nil, err
+	}
+	cfg.Redis.Password = os.Getenv(envRedisPass)
+	cfg.Redis.User = os.Getenv(envRedisUser)
 
 	log.Info("config parsed")
 

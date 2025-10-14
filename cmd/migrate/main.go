@@ -16,11 +16,12 @@ func main() {
 		panic("failed to connect database")
 	}
 
+	// Временно мигрируем только User, так как остальные таблицы зависят от старой структуры User
 	err = db.AutoMigrate(
 		&ds.User{},
-		&ds.ChronicleResource{},
-		&ds.RequestChronicleResearch{},
-		&ds.ChronicleResearch{},
+		// &ds.ChronicleResource{},
+		// &ds.RequestChronicleResearch{},
+		// &ds.ChronicleResearch{},
 	)
 	if err != nil {
 		panic("cant migrate db")

@@ -2,61 +2,26 @@ package repository
 
 import (
 	"Lab1/intermal/app/ds"
-	"errors"
-
-	"gorm.io/gorm"
+	"github.com/google/uuid"
 )
 
-func (r *Repository) CreateUser(user ds.User) (ds.User, error) {
-	if user.Name == "" {
-		user.Name = "Пользователь"
+func (r *Repository) Register(user *ds.User) error {
+	if user.UUID == uuid.Nil {
+		user.UUID = uuid.New()
 	}
-	err := r.db.Create(&user).Error
-	return user, err
+
+	return r.db.Create(user).Error
 }
 
-func (r *Repository) GetUserByID(id uint) (ds.User, error) {
-	var u ds.User
-	err := r.db.First(&u, id).Error
+func (r *Repository) GetUserByLogin(login string) (*ds.User, error) {
+	user := &ds.User{
+		Name: login,
+	}
+
+	err := r.db.First(user).Error
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ds.User{}, errors.New("user not found")
-		}
-		return ds.User{}, err
-	}
-	return u, nil
-}
-
-func (r *Repository) GetUserByEmail(email string) (ds.User, error) {
-	var u ds.User
-	err := r.db.Where("email = ?", email).First(&u).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ds.User{}, errors.New("user not found")
-		}
-		return ds.User{}, err
-	}
-	return u, nil
-}
-
-func (r *Repository) UpdateUser(id uint, user ds.User) error {
-	updates := map[string]interface{}{
-		"name": user.Name,
+		return nil, err
 	}
 
-	// is_moderator может обновлять только администратор
-	updates["is_moderator"] = user.IsModerator
-
-	return r.db.Model(&ds.User{}).Where("id = ?", id).Updates(updates).Error
-}
-
-func (r *Repository) CheckCredentials(email, password string) (ds.User, error) {
-	u, err := r.GetUserByEmail(email)
-	if err != nil {
-		return ds.User{}, err
-	}
-	if u.Password != password {
-		return ds.User{}, errors.New("invalid credentials")
-	}
-	return u, nil
+	return user, nil
 }

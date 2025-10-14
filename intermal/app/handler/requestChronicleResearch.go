@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"Lab1/intermal/app/ds"
+	"Lab1/intermal/app/middleware"
 	"Lab1/intermal/app/repository"
 
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,19 @@ func (h *Handler) GetDraftRequestInfoAPI(ctx *gin.Context) {
 	})
 }
 
+// GetRequestChronicleResearchAPI godoc
+// @Summary Получить список заявок
+// @Description Получить список заявок (для пользователя - только свои, для модератора - все)
+// @Tags ChronicleRequestList
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param status query string false "Фильтр по статусу"
+// @Param start_date query string false "Дата начала (YYYY-MM-DD)"
+// @Param end_date query string false "Дата окончания (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "success"
+// @Failure 401 {object} map[string]interface{} "error"
+// @Router /api/ChronicleRequestList [get]
 func (h *Handler) GetRequestChronicleResearchAPI(ctx *gin.Context) {
 	var startDate, endDate *time.Time
 	status := ctx.Query("status")
@@ -43,7 +57,35 @@ func (h *Handler) GetRequestChronicleResearchAPI(ctx *gin.Context) {
 		}
 	}
 
-	requests, err := h.Repository.GetRequestChronicleResearch(status, startDate, endDate)
+	// Получаем UUID пользователя из контекста (для JWT)
+	userUUID, exists := middleware.GetUserUUID(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user not authenticated"))
+		return
+	}
+
+	// Получаем роль пользователя из контекста
+	userRole, exists := middleware.GetUserRole(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user role not found"))
+		return
+	}
+
+	// Проверяем, является ли пользователь модератором (Admin role = 2)
+	isModerator := userRole == 2
+
+	// Если не модератор - показываем только его заявки
+	var requests []ds.RequestChronicleResearch
+	var err error
+
+	if isModerator {
+		// Модератор видит все заявки
+		requests, err = h.Repository.GetRequestChronicleResearch(status, startDate, endDate)
+	} else {
+		// Обычный пользователь видит только свои заявки
+		requests, err = h.Repository.GetRequestChronicleResearchByCreator(userUUID, status, startDate, endDate)
+	}
+
 	if err != nil {
 		h.errorHandler(ctx, http.StatusInternalServerError, err)
 		return
@@ -143,6 +185,19 @@ func (h *Handler) FormRequestChronicleResearchAPI(ctx *gin.Context) {
 	})
 }
 
+// CompleteOrRejectRequestChronicleResearchAPI godoc
+// @Summary Завершить или отклонить заявку
+// @Description Завершение или отклонение заявки (только для модератора)
+// @Tags ChronicleRequestList
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id_chronicle_request path integer true "ID заявки"
+// @Param action body object{action=string} true "Действие: complete или reject"
+// @Success 200 {object} map[string]interface{} "success"
+// @Failure 400 {object} map[string]interface{} "error"
+// @Failure 403 {object} map[string]interface{} "error - не модератор"
+// @Router /api/ChronicleRequestList/{id_chronicle_request}/chronicle_complete-or-reject [put]
 func (h *Handler) CompleteOrRejectRequestChronicleResearchAPI(ctx *gin.Context) {
 	idStr := ctx.Param("id_chronicle_request")
 	id, err := strconv.ParseUint(idStr, 10, 32)

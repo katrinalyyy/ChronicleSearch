@@ -1,9 +1,13 @@
 package ds
 
+import (
+	"Lab1/intermal/app/role"
+	"github.com/google/uuid"
+)
+
 type User struct {
-	ID          uint   `gorm:"primaryKey;autoIncrement" json:"id,omitempty"`
-	Email       string `gorm:"type:varchar(25);unique;not null" json:"login"`
-	Name        string `gorm:"type:varchar(50);not null" json:"name"`
-	Password    string `gorm:"type:varchar(50);not null" json:"password,omitempty"`
-	IsModerator bool   `gorm:"type:boolean;default:false" json:"is_moderator,omitempty"`
+	UUID uuid.UUID `gorm:"type:uuid" json:"uuid"`
+	Name string    `json:"name"`
+	Role role.Role `sql:"type:string;" json:"role"`
+	Pass string    `json:"pass"`
 }

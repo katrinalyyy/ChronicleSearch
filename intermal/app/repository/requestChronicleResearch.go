@@ -6,12 +6,33 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 func (r *Repository) GetRequestChronicleResearch(status string, dateFrom, dateTo *time.Time) ([]ds.RequestChronicleResearch, error) {
 	var requests []ds.RequestChronicleResearch
 	query := r.db.Where("status != ? AND status != ?", ds.RequestStatusDeleted, ds.RequestStatusDraft)
+
+	if status != "" {
+		query = query.Where("status = ?", status)
+	}
+
+	if dateFrom != nil {
+		query = query.Where("formed_at >= ?", *dateFrom)
+	}
+	if dateTo != nil {
+		query = query.Where("formed_at <= ?", *dateTo)
+	}
+
+	err := query.Preload("Creator").Preload("Moderator").Order("formed_at DESC").Find(&requests).Error
+	return requests, err
+}
+
+// GetRequestChronicleResearchByCreator возвращает заявки конкретного пользователя
+func (r *Repository) GetRequestChronicleResearchByCreator(creatorID string, status string, dateFrom, dateTo *time.Time) ([]ds.RequestChronicleResearch, error) {
+	var requests []ds.RequestChronicleResearch
+	query := r.db.Where("creator_id = ? AND status != ? AND status != ?", creatorID, ds.RequestStatusDeleted, ds.RequestStatusDraft)
 
 	if status != "" {
 		query = query.Where("status = ?", status)
@@ -55,7 +76,7 @@ func (r *Repository) GetRequestWithChronicles(id uint) (ds.RequestChronicleResea
 	return request, chronicles, nil
 }
 
-func (r *Repository) CreateRequestChronicleResearch(creatorID uint) (ds.RequestChronicleResearch, error) {
+func (r *Repository) CreateRequestChronicleResearch(creatorID uuid.UUID) (ds.RequestChronicleResearch, error) {
 	request := ds.RequestChronicleResearch{
 		Name:        "", // Пустое имя для черновика
 		SearchEvent: "",
@@ -83,7 +104,7 @@ func (r *Repository) UpdateRequestChronicleResearch(id uint, request ds.RequestC
 	return r.db.Model(&existingRequest).Updates(updates).Error
 }
 
-func (r *Repository) UpdateRequestStatus(id uint, newStatus ds.RequestStatus, moderatorID *uint) error {
+func (r *Repository) UpdateRequestStatus(id uint, newStatus ds.RequestStatus, moderatorID *uuid.UUID) error {
 	var request ds.RequestChronicleResearch
 	err := r.db.Where("id = ? AND status != ?", id, ds.RequestStatusDeleted).First(&request).Error
 	if err != nil {
@@ -135,7 +156,7 @@ func (r *Repository) isValidStatusTransition(current, new ds.RequestStatus) bool
 }
 
 // помечает заявку как удаленную (только создатель)
-func (r *Repository) DeleteRequestChronicleResearch(id uint, creatorID uint) error {
+func (r *Repository) DeleteRequestChronicleResearch(id uint, creatorID uuid.UUID) error {
 	tx := r.db.Model(&ds.RequestChronicleResearch{}).
 		Where("id = ? AND creator_id = ? AND status = ?", id, creatorID, ds.RequestStatusDraft).
 		Update("status", ds.RequestStatusDeleted)
@@ -150,7 +171,7 @@ func (r *Repository) DeleteRequestChronicleResearch(id uint, creatorID uint) err
 }
 
 // переводит заявку в статус "сформирован" (только создатель)
-func (r *Repository) FormRequestChronicleResearch(id uint, creatorID uint) error {
+func (r *Repository) FormRequestChronicleResearch(id uint, creatorID uuid.UUID) error {
 	// Проверяем что это черновик текущего пользователя
 	draft, _, err := r.GetDraftRequestChronicleResearchInfo()
 	if err != nil || draft.ID != id {
@@ -174,7 +195,7 @@ func (r *Repository) FormRequestChronicleResearch(id uint, creatorID uint) error
 }
 
 // завершает заявку (только модератор)
-func (r *Repository) CompleteRequestChronicleResearch(id uint, moderatorID uint) error {
+func (r *Repository) CompleteRequestChronicleResearch(id uint, moderatorID uuid.UUID) error {
 	// Выполняем расчеты при завершении заявки
 	err := r.calculateRequestMetrics(id)
 	if err != nil {
@@ -185,7 +206,7 @@ func (r *Repository) CompleteRequestChronicleResearch(id uint, moderatorID uint)
 }
 
 // отклоняет заявку (только модератор)
-func (r *Repository) RejectRequestChronicleResearch(id uint, moderatorID uint) error {
+func (r *Repository) RejectRequestChronicleResearch(id uint, moderatorID uuid.UUID) error {
 	return r.UpdateRequestStatus(id, ds.RequestStatusRejected, &moderatorID)
 }
 
