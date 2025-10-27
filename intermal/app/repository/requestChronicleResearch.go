@@ -173,7 +173,7 @@ func (r *Repository) DeleteRequestChronicleResearch(id uint, creatorID uuid.UUID
 // переводит заявку в статус "сформирован" (только создатель)
 func (r *Repository) FormRequestChronicleResearch(id uint, creatorID uuid.UUID) error {
 	// Проверяем что это черновик текущего пользователя
-	draft, _, err := r.GetDraftRequestChronicleResearchInfo()
+	draft, _, err := r.GetDraftRequestChronicleResearchInfo(creatorID)
 	if err != nil || draft.ID != id {
 		return fmt.Errorf("доступен только черновик текущего пользователя")
 	}
@@ -250,9 +250,7 @@ func (r *Repository) AddChronicleToRequest(requestID uint, chronicleID uint, quo
 }
 
 // GetDraftRequestChronicleResearchInfo возвращает информацию о черновике заявки
-func (r *Repository) GetDraftRequestChronicleResearchInfo() (ds.RequestChronicleResearch, []ds.ChronicleResearch, error) {
-	creatorID := GetFixedCreatorID()
-
+func (r *Repository) GetDraftRequestChronicleResearchInfo(creatorID uuid.UUID) (ds.RequestChronicleResearch, []ds.ChronicleResearch, error) {
 	var request ds.RequestChronicleResearch
 	err := r.db.Preload("Creator").Preload("Moderator").Where("creator_id = ? AND status = ?", creatorID, ds.RequestStatusDraft).First(&request).Error
 	if err != nil {
@@ -269,9 +267,7 @@ func (r *Repository) GetDraftRequestChronicleResearchInfo() (ds.RequestChronicle
 }
 
 // GetDraftRequestInfo возвращает ID черновика и количество услуг в корзине
-func (r *Repository) GetDraftRequestInfo() (uint, int, error) {
-	creatorID := GetFixedCreatorID()
-
+func (r *Repository) GetDraftRequestInfo(creatorID uuid.UUID) (uint, int, error) {
 	var request ds.RequestChronicleResearch
 	err := r.db.Where("creator_id = ? AND status = ?", creatorID, ds.RequestStatusDraft).First(&request).Error
 	if err != nil {
@@ -291,13 +287,13 @@ func (r *Repository) GetDraftRequestInfo() (uint, int, error) {
 }
 
 // CreateRequestChronicleResearchWithChronicle создает заявку-черновик с хроникой
-func (r *Repository) CreateRequestChronicleResearchWithChronicle(chronicleID uint) (ds.RequestChronicleResearch, error) {
+func (r *Repository) CreateRequestChronicleResearchWithChronicle(creatorID uuid.UUID, chronicleID uint) (ds.RequestChronicleResearch, error) {
 	request := ds.RequestChronicleResearch{
 		Name:        "",
 		SearchEvent: "",
 		Status:      ds.RequestStatusDraft,
 		CreatedAt:   time.Now(),
-		CreatorID:   GetFixedCreatorID(),
+		CreatorID:   creatorID,
 	}
 
 	err := r.db.Create(&request).Error

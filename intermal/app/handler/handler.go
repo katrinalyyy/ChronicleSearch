@@ -46,34 +46,34 @@ func (h *Handler) RegisterAPI(router *gin.Engine) {
 			chronicles.GET("", h.GetChronicleResourcesAPI)
 			chronicles.GET("/:id_chronicle_resource", h.GetChronicleResourceAPI)
 
-			// Методы создания/изменения - требуют авторизации (Buyer, Manager, Admin)
-			chronicles.POST("", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.CreateChronicleResourceAPI)
-			chronicles.PUT("/:id_chronicle_resource", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.UpdateChronicleResourceAPI)
-			chronicles.DELETE("/:id_chronicle_resource", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.DeleteChronicleResourceAPI)
-			chronicles.POST("/:id_chronicle_resource/image", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.UploadChronicleResourceImageAPI)
-			chronicles.POST("/:id_chronicle_resource/add_to_chronicle_request", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.AddChronicleToRequestAPI)
+			// Методы создания/изменения - требуют авторизации (Исследователь и Модератор)
+			chronicles.POST("", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.CreateChronicleResourceAPI)
+			chronicles.PUT("/:id_chronicle_resource", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.UpdateChronicleResourceAPI)
+			chronicles.DELETE("/:id_chronicle_resource", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.DeleteChronicleResourceAPI)
+			chronicles.POST("/:id_chronicle_resource/image", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.UploadChronicleResourceImageAPI)
+			chronicles.POST("/:id_chronicle_resource/add_to_chronicle_request", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.AddChronicleToRequestAPI)
 		}
 
 		// Requests - требуют авторизации
 		requests := api.Group("/ChronicleRequestList")
 		{
-			requests.GET("/chronicle_draft", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.GetDraftRequestInfoAPI)
-			requests.GET("", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.GetRequestChronicleResearchAPI)
-			requests.GET("/:id_chronicle_request", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.GetRequestWithChroniclesAPI)
-			requests.PUT("/:id_chronicle_request", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.UpdateRequestChronicleResearchAPI)
-			requests.PUT("/:id_chronicle_request/chronicle_request-form", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.FormRequestChronicleResearchAPI)
+			requests.GET("/chronicle_draft", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.GetDraftRequestInfoAPI)
+			requests.GET("", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.GetRequestChronicleResearchAPI)
+			requests.GET("/:id_chronicle_request", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.GetRequestWithChroniclesAPI)
+			requests.PUT("/:id_chronicle_request", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.UpdateRequestChronicleResearchAPI)
+			requests.PUT("/:id_chronicle_request/chronicle_request-form", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.FormRequestChronicleResearchAPI)
 
-			// Завершение/отклонение - только для Admin
-			requests.PUT("/:id_chronicle_request/chronicle_complete-or-reject", h.App.WithAuthCheck(role.Admin), h.CompleteOrRejectRequestChronicleResearchAPI)
+			// Завершение/отклонение - только для Модератора
+			requests.PUT("/:id_chronicle_request/chronicle_complete-or-reject", h.App.WithAuthCheck(role.Moderator), h.CompleteOrRejectRequestChronicleResearchAPI)
 
-			requests.DELETE("/:id_chronicle_request", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.DeleteRequestChronicleResearchAPI)
+			requests.DELETE("/:id_chronicle_request", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.DeleteRequestChronicleResearchAPI)
 		}
 
 		// Chronicle Research - требуют авторизации
 		chronicleResearch := api.Group("/chronicle_research")
 		{
-			chronicleResearch.PUT("/:id/chronicles/:chronicle_id", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.UpdateChronicleResearchInRequestAPI)
-			chronicleResearch.DELETE("/:id/chronicles/:chronicle_id", h.App.WithAuthCheck(role.Buyer, role.Manager, role.Admin), h.DeleteChronicleResearchFromRequestAPI)
+			chronicleResearch.PUT("/:id/chronicles/:chronicle_id", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.UpdateChronicleResearchInRequestAPI)
+			chronicleResearch.DELETE("/:id/chronicles/:chronicle_id", h.App.WithAuthCheck(role.Researcher, role.Moderator), h.DeleteChronicleResearchFromRequestAPI)
 		}
 	}
 }

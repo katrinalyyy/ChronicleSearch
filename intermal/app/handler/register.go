@@ -23,7 +23,7 @@ type registerResp struct {
 
 // Register godoc
 // @Summary Регистрация нового пользователя
-// @Description Создание нового пользователя с ролью Buyer
+// @Description Создание нового пользователя с ролью Исследователь
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -53,7 +53,7 @@ func (h *Handler) Register(gCtx *gin.Context) {
 
 	err = h.Repository.Register(&ds.User{
 		UUID: uuid.New(),
-		Role: role.Buyer,
+		Role: role.Researcher,
 		Name: req.Name,
 		Pass: generateHashString(req.Pass), // пароли делаем в хешированном виде и далее будем сравнивать хеш, чтобы их не утянули
 	})

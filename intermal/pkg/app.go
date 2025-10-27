@@ -50,7 +50,7 @@ func (a *Application) WithAuthCheck(assignedRoles ...interface{}) gin.HandlerFun
 func (a *Application) withAuthCheckInternal(assignedRoles ...role.Role) func(ctx *gin.Context) {
 	return func(gCtx *gin.Context) {
 		log.Printf("[AUTH] Starting auth check for path: %s", gCtx.Request.URL.Path)
-		
+
 		jwtStr := gCtx.GetHeader("Authorization")
 		if !strings.HasPrefix(jwtStr, jwtPrefix) { // если нет префикса то нас дурят!
 			log.Printf("[AUTH] Missing or invalid Authorization header")
@@ -120,8 +120,8 @@ func (a *Application) RunApp() {
 	logrus.Info("Server start up")
 
 	// Регистрируем ping с проверкой ролей (для тестирования)
-	// Доступен только для Admin (Buyer = 0, Manager = 1, Admin = 2)
-	a.Router.GET("/ping", a.withAuthCheckInternal(role.Admin), a.Handler.Ping)
+	// Доступен только для Модератора (Researcher = 0, Moderator = 1)
+	a.Router.GET("/ping", a.withAuthCheckInternal(role.Moderator), a.Handler.Ping)
 
 	a.Handler.RegisterSwagger(a.Router)
 	a.Handler.RegisterAPI(a.Router)

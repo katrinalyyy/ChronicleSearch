@@ -9,13 +9,27 @@ import (
 
 	"Lab1/intermal/app/ds"
 	"Lab1/intermal/app/middleware"
-	"Lab1/intermal/app/repository"
+	"Lab1/intermal/app/role"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (h *Handler) GetDraftRequestInfoAPI(ctx *gin.Context) {
-	requestID, count, err := h.Repository.GetDraftRequestInfo()
+	// Получаем UUID пользователя из контекста
+	userUUIDStr, exists := middleware.GetUserUUID(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user UUID not found in context"))
+		return
+	}
+
+	userUUID, err := uuid.Parse(userUUIDStr)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusInternalServerError, fmt.Errorf("invalid user UUID"))
+		return
+	}
+
+	requestID, count, err := h.Repository.GetDraftRequestInfo(userUUID)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusInternalServerError, err)
 		return
@@ -71,8 +85,8 @@ func (h *Handler) GetRequestChronicleResearchAPI(ctx *gin.Context) {
 		return
 	}
 
-	// Проверяем, является ли пользователь модератором (Admin role = 2)
-	isModerator := userRole == 2
+	// Проверяем, является ли пользователь модератором (Moderator role = 1)
+	isModerator := userRole == int(role.Moderator)
 
 	// Если не модератор - показываем только его заявки
 	var requests []ds.RequestChronicleResearch
@@ -167,7 +181,20 @@ func (h *Handler) FormRequestChronicleResearchAPI(ctx *gin.Context) {
 		return
 	}
 
-	err = h.Repository.FormRequestChronicleResearch(uint(id), repository.GetFixedCreatorID())
+	// Получаем UUID пользователя из контекста
+	userUUIDStr, exists := middleware.GetUserUUID(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user UUID not found in context"))
+		return
+	}
+
+	userUUID, err := uuid.Parse(userUUIDStr)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusInternalServerError, fmt.Errorf("invalid user UUID"))
+		return
+	}
+
+	err = h.Repository.FormRequestChronicleResearch(uint(id), userUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "cannot be formed") ||
 			strings.Contains(err.Error(), "доступен только черновик") || strings.Contains(err.Error(), "заявка пуста") ||
@@ -206,6 +233,19 @@ func (h *Handler) CompleteOrRejectRequestChronicleResearchAPI(ctx *gin.Context) 
 		return
 	}
 
+	// Получаем UUID модератора из контекста
+	userUUIDStr, exists := middleware.GetUserUUID(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user UUID not found in context"))
+		return
+	}
+
+	userUUID, err := uuid.Parse(userUUIDStr)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusInternalServerError, fmt.Errorf("invalid user UUID"))
+		return
+	}
+
 	var requestBody struct {
 		Action string `json:"action" binding:"required"` // "complete" или "reject"
 	}
@@ -217,7 +257,7 @@ func (h *Handler) CompleteOrRejectRequestChronicleResearchAPI(ctx *gin.Context) 
 
 	switch requestBody.Action {
 	case "complete":
-		err = h.Repository.CompleteRequestChronicleResearch(uint(id), repository.GetFixedModeratorID())
+		err = h.Repository.CompleteRequestChronicleResearch(uint(id), userUUID)
 		if err != nil {
 			if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "cannot be completed") {
 				h.errorHandler(ctx, http.StatusBadRequest, err)
@@ -231,7 +271,7 @@ func (h *Handler) CompleteOrRejectRequestChronicleResearchAPI(ctx *gin.Context) 
 			"message": "Request completed successfully",
 		})
 	case "reject":
-		err = h.Repository.RejectRequestChronicleResearch(uint(id), repository.GetFixedModeratorID())
+		err = h.Repository.RejectRequestChronicleResearch(uint(id), userUUID)
 		if err != nil {
 			if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "cannot be rejected") {
 				h.errorHandler(ctx, http.StatusBadRequest, err)
@@ -257,7 +297,20 @@ func (h *Handler) DeleteRequestChronicleResearchAPI(ctx *gin.Context) {
 		return
 	}
 
-	err = h.Repository.DeleteRequestChronicleResearch(uint(id), repository.GetFixedCreatorID())
+	// Получаем UUID пользователя из контекста
+	userUUIDStr, exists := middleware.GetUserUUID(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user UUID not found in context"))
+		return
+	}
+
+	userUUID, err := uuid.Parse(userUUIDStr)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusInternalServerError, fmt.Errorf("invalid user UUID"))
+		return
+	}
+
+	err = h.Repository.DeleteRequestChronicleResearch(uint(id), userUUID)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "cannot be deleted") {
 			h.errorHandler(ctx, http.StatusBadRequest, err)

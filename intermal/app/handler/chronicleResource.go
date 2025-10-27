@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	"Lab1/intermal/app/ds"
+	"Lab1/intermal/app/middleware"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // GetChronicleResourcesAPI godoc
@@ -219,6 +221,19 @@ func (h *Handler) AddChronicleToRequestAPI(ctx *gin.Context) {
 		return
 	}
 
+	// Получаем UUID пользователя из контекста
+	userUUIDStr, exists := middleware.GetUserUUID(ctx)
+	if !exists {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("user UUID not found in context"))
+		return
+	}
+	
+	userUUID, err := uuid.Parse(userUUIDStr)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusInternalServerError, fmt.Errorf("invalid user UUID"))
+		return
+	}
+
 	_, err = h.Repository.GetChronicleResource(uint(chronicleID))
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -229,9 +244,9 @@ func (h *Handler) AddChronicleToRequestAPI(ctx *gin.Context) {
 		return
 	}
 
-	draftRequest, _, err := h.Repository.GetDraftRequestChronicleResearchInfo()
+	draftRequest, _, err := h.Repository.GetDraftRequestChronicleResearchInfo(userUUID)
 	if err != nil {
-		draftRequest, err = h.Repository.CreateRequestChronicleResearchWithChronicle(uint(chronicleID))
+		draftRequest, err = h.Repository.CreateRequestChronicleResearchWithChronicle(userUUID, uint(chronicleID))
 		if err != nil {
 			h.errorHandler(ctx, http.StatusInternalServerError, fmt.Errorf("failed to create draft request: %v", err))
 			return
